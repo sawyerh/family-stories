@@ -1,0 +1,12 @@
+{% capture js %}
+content = [{% for asset in site.pages['stories'].assets %}{
+  "start": {{ asset.meta.start | fallback:'-1' }},
+  {% if asset.type == 'image' %}
+  "image": {{ asset.url | json }}
+  {% elsif asset.type == 'video' %}
+  "video": {{ asset.url | json }},
+  "color": {{ asset.meta.color | json }}
+  {% endif %}
+}{% unless forloop.last %},{%endunless%}{% endfor %}];
+{% endcapture %}
+{{ js }}
