@@ -90,10 +90,24 @@ body
   font-style: italic
   z-index: 100
   text-align: center
+  display: none
 
   p
-    max-width: 950px
-    margin: 0 auto
+    max-width: 850px
+    margin: 0 auto 20px
+
+.not-played .intro
+  display: block
+
+.start-button
+  transition: border 250ms ease
+  font-size: 70px
+  font-style: normal
+  border-bottom: 2px solid rgba(#fff, 0.2)
+  cursor: pointer
+
+  &:hover
+    border-bottom-color: rgba(#fff, 1)
 
 .image
   +transform-style(preserve-3d) // fixes animation flicker

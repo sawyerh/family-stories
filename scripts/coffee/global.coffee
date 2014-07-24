@@ -94,5 +94,10 @@ $ ->
   advanceShow()
   initAudioPlayer()
 
+  $('.start-button').on 'click', ->
+    body = document.body
+    body.classList.remove('not-played')
+    body.classList.add('playing')
+
   $(document).on 'click', '.image-wrap', ->
     advanceShow()

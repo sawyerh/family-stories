@@ -102,6 +102,12 @@
     setMedia(contentElements["alpha"], content[0]);
     advanceShow();
     initAudioPlayer();
+    $('.start-button').on('click', function() {
+      var body;
+      body = document.body;
+      body.classList.remove('not-played');
+      return body.classList.add('playing');
+    });
     return $(document).on('click', '.image-wrap', function() {
       return advanceShow();
     });
