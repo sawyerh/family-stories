@@ -28,28 +28,22 @@ body
 
 .image-wrap
   background: #000
-  display: none
+  opacity: 0
   z-index: 10
   position: fixed
   top: 0
   left: 0
   width: 100%
   height: 100%
-  +transform-style(preserve-3d)
-  +backface-visibility(hidden)
-
-  &.fade-in
-    +animation(fadeIn 1.5s ease)
+  pointer-events: none
+  // +transform-style(preserve-3d)
+  // +backface-visibility(hidden)
+  transition: opacity 2s ease
 
   &.is-active
     z-index: 20
-
-  &.is-exiting
-    +prefix-property(animation-play-state, paused)
-
-  &.is-exiting,
-  &.is-active
-    display: block
+    opacity: 1
+    pointer-events: auto
 
   &:after
     background: url('/assets/noise.gif') center center
@@ -62,13 +56,13 @@ body
     z-index: 1
     opacity: 0.02
 
-.not-played .image-wrap
+.not-played .is-active
   opacity: 0.3
 
-.playing .is-active.is-image .image
-  +animation(zoom 120s infinite linear 1s)
+// .playing .is-active.is-image .image
+//   +animation(zoom 120s infinite linear 1s)
 
-.intro, .image, .video
+.intro, .media
   +backface-visibility(hidden)
   +transform(translate3d(-50%, -50%, 0))
   +transform-origin(0% 0%)
@@ -92,8 +86,15 @@ body
   text-align: center
   display: none
 
+  +max-width(900px)
+    font-size: 32px
+
+  +max-width(600px)
+    font-size: 24px
+
   p
     max-width: 850px
+    padding: 0 30px
     margin: 0 auto 20px
 
 .not-played .intro
@@ -111,6 +112,11 @@ body
 
 .image
   +transform-style(preserve-3d) // fixes animation flicker
+
+.map
+  width: 1000px
+  height: 600px
+  +transform(translate3d(-50%, -50%, 0) !important)
 
 .video
   width: 800px * 1.3625
@@ -130,4 +136,19 @@ body
   visibility: hidden
   position: relative
   z-index: 99
+  pointer-events: none
+
+.play-toggle
+  position: fixed
+  right: 20px
+  bottom: 20px
+  font-size: 16px
+  color: rgba(#fff, 0.85)
+  text-shadow: 0 0 20px rgba(#000, 0.4)
+  transition: opacity 250ms ease
+  cursor: pointer
+  z-index: 200
+
+.not-played .play-toggle
+  opacity: 0
   pointer-events: none
