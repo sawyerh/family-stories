@@ -121,11 +121,7 @@ goTo = (index) ->
 
   time = currentItem["start"]
   audioPlayer.play()
-
-  window.setTimeout ->
-    # Hack to get seekTo to work
-    audioPlayer.seekTo(time)
-  , 500
+  audioPlayer.seekTo(time)
 
 
 setMedia = (set, item) ->
@@ -168,6 +164,16 @@ setMedia = (set, item) ->
   set["wrap"].classList.add("is-#{currentType}")
 
 
+toggleChapterList = ->
+  chaptersList.classList.toggle('is-hidden')
+
+  if chaptersList.classList.contains('is-hidden')
+    $(window).off 'keyup.chapters'
+  else
+    $(window).on 'keyup.chapters', (e) ->
+      toggleChapterList() if e.keyCode == 27 # esc
+
+
 $ ->
   setMedia(visibleSet, content[0])
   setMedia(hiddenSet, content[1])
@@ -181,14 +187,20 @@ $ ->
     audioPlayer.toggle()
 
   $('.chapters-toggle').on 'click', ->
-    chaptersList.classList.toggle('is-hidden')
+    toggleChapterList()
 
   $('.chapter-link').on 'click', ->
     index = this.getAttribute('data-index')
-    chaptersList.classList.add('is-hidden')
+    toggleChapterList()
     document.body.classList.remove('not-played')
     goTo(index)
 
   # Check for blurred bg support
   if !(Modernizr['cssfilters'] || Modernizr['svgfilters'])
     document.body.classList.add('no-blur')
+
+  # Play/pause shortcut
+  $(window).on 'keyup.global', (e) ->
+    if e.keyCode == 32 # space
+      document.body.classList.remove('not-played')
+      audioPlayer.toggle()

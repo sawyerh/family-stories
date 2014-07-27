@@ -1,5 +1,5 @@
 (function() {
-  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, getYoutubeIframe, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, transitionEndEventName, transitionEndEventNames, visibleSet;
+  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, getYoutubeIframe, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, toggleChapterList, transitionEndEventName, transitionEndEventNames, visibleSet;
 
   alphaWrap = document.querySelector('.alpha');
 
@@ -130,9 +130,7 @@
     advanceShow();
     time = currentItem["start"];
     audioPlayer.play();
-    return window.setTimeout(function() {
-      return audioPlayer.seekTo(time);
-    }, 500);
+    return audioPlayer.seekTo(time);
   };
 
   setMedia = function(set, item) {
@@ -176,6 +174,19 @@
     return set["wrap"].classList.add("is-" + currentType);
   };
 
+  toggleChapterList = function() {
+    chaptersList.classList.toggle('is-hidden');
+    if (chaptersList.classList.contains('is-hidden')) {
+      return $(window).off('keyup.chapters');
+    } else {
+      return $(window).on('keyup.chapters', function(e) {
+        if (e.keyCode === 27) {
+          return toggleChapterList();
+        }
+      });
+    }
+  };
+
   $(function() {
     setMedia(visibleSet, content[0]);
     setMedia(hiddenSet, content[1]);
@@ -188,18 +199,24 @@
       return audioPlayer.toggle();
     });
     $('.chapters-toggle').on('click', function() {
-      return chaptersList.classList.toggle('is-hidden');
+      return toggleChapterList();
     });
     $('.chapter-link').on('click', function() {
       var index;
       index = this.getAttribute('data-index');
-      chaptersList.classList.add('is-hidden');
+      toggleChapterList();
       document.body.classList.remove('not-played');
       return goTo(index);
     });
     if (!(Modernizr['cssfilters'] || Modernizr['svgfilters'])) {
-      return document.body.classList.add('no-blur');
+      document.body.classList.add('no-blur');
     }
+    return $(window).on('keyup.global', function(e) {
+      if (e.keyCode === 32) {
+        document.body.classList.remove('not-played');
+        return audioPlayer.toggle();
+      }
+    });
   });
 
 }).call(this);
