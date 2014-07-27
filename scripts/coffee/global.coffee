@@ -9,6 +9,7 @@ contentElements = {
     image: alphaWrap.querySelector('.image')
     map: alphaWrap.querySelector('.map')
     video: alphaWrap.querySelector('.video')
+    videoFrame: alphaWrap.querySelector('.video-frame')
   }
   "beta": {
     wrap: betaWrap
@@ -16,6 +17,7 @@ contentElements = {
     image: betaWrap.querySelector('.image')
     map: betaWrap.querySelector('.map')
     video: betaWrap.querySelector('.video')
+    videoFrame: betaWrap.querySelector('.video-frame')
   }
 }
 currentIndex = 0
@@ -66,8 +68,8 @@ advanceShow = ->
   hiddenSet["wrap"].classList.remove('is-active')
 
   # Play if video
-  if visibleSet["wrap"].classList.contains('is-video')
-    visibleSet["video"].play()
+  # if visibleSet["wrap"].classList.contains('is-video')
+  #   visibleSet["video"].play()
 
   # Preload and hide next content after current item's animationEnd
   $(visibleSet["wrap"]).on transitionEndEventName, ->
@@ -109,6 +111,9 @@ initMap = (set, item) ->
   myPano.setVisible true
 
 
+getYoutubeIframe = (id) ->
+  "<iframe width='420' height='315' src='//www.youtube.com/embed/#{id}?rel=0&loop=1&autoplay=1&controls=0&playsinline=1&modestbranding=1&playlist=#{id}' frameborder='0'></iframe>"
+
 goTo = (index) ->
   currentIndex = index - 1
   setMedia(hiddenSet, content[index])
@@ -129,12 +134,7 @@ setMedia = (set, item) ->
   set["bg"].src = item['image']
 
   if item['video']
-    if Modernizr.video && Modernizr.video.h264
-      set["video"].src = item['video']
-    else
-      set["video"].src = item['ogv']
-
-    set["video"].setAttribute('poster', item['image'])
+    set["videoFrame"].innerHTML = getYoutubeIframe(item['youtube'])
     set["video"].classList.remove('is-hidden')
     set["image"].classList.add('is-hidden')
     set["wrap"].style['background'] = item['color']
@@ -151,7 +151,7 @@ setMedia = (set, item) ->
       set["image"].classList.remove('is-hidden')
       currentType = 'image'
 
-    set["video"].src = '' # stops the video from loading anymore
+    set["videoFrame"].innerHTML = '' # stops the video from loading anymore
     set["video"].classList.add('is-hidden')
     set["wrap"].style['background'] = ''
 

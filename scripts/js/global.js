@@ -1,5 +1,5 @@
 (function() {
-  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, transitionEndEventName, transitionEndEventNames, visibleSet;
+  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, getYoutubeIframe, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, transitionEndEventName, transitionEndEventNames, visibleSet;
 
   alphaWrap = document.querySelector('.alpha');
 
@@ -15,14 +15,16 @@
       bg: alphaWrap.querySelector('.bg'),
       image: alphaWrap.querySelector('.image'),
       map: alphaWrap.querySelector('.map'),
-      video: alphaWrap.querySelector('.video')
+      video: alphaWrap.querySelector('.video'),
+      videoFrame: alphaWrap.querySelector('.video-frame')
     },
     "beta": {
       wrap: betaWrap,
       bg: betaWrap.querySelector('.bg'),
       image: betaWrap.querySelector('.image'),
       map: betaWrap.querySelector('.map'),
-      video: betaWrap.querySelector('.video')
+      video: betaWrap.querySelector('.video'),
+      videoFrame: betaWrap.querySelector('.video-frame')
     }
   };
 
@@ -74,9 +76,6 @@
     visibleSet["wrap"].classList.add('is-active');
     hiddenSet["wrap"].classList.add('is-exiting');
     hiddenSet["wrap"].classList.remove('is-active');
-    if (visibleSet["wrap"].classList.contains('is-video')) {
-      visibleSet["video"].play();
-    }
     return $(visibleSet["wrap"]).on(transitionEndEventName, function() {
       $(visibleSet["wrap"]).off(transitionEndEventName);
       hiddenSet["wrap"].classList.remove('is-exiting');
@@ -120,6 +119,10 @@
     return myPano.setVisible(true);
   };
 
+  getYoutubeIframe = function(id) {
+    return "<iframe width='420' height='315' src='//www.youtube.com/embed/" + id + "?rel=0&loop=1&autoplay=1&controls=0&playsinline=1&modestbranding=1&playlist=" + id + "' frameborder='0'></iframe>";
+  };
+
   goTo = function(index) {
     var time;
     currentIndex = index - 1;
@@ -137,12 +140,7 @@
     hasMap = false;
     set["bg"].src = item['image'];
     if (item['video']) {
-      if (Modernizr.video && Modernizr.video.h264) {
-        set["video"].src = item['video'];
-      } else {
-        set["video"].src = item['ogv'];
-      }
-      set["video"].setAttribute('poster', item['image']);
+      set["videoFrame"].innerHTML = getYoutubeIframe(item['youtube']);
       set["video"].classList.remove('is-hidden');
       set["image"].classList.add('is-hidden');
       set["wrap"].style['background'] = item['color'];
@@ -159,7 +157,7 @@
         set["image"].classList.remove('is-hidden');
         currentType = 'image';
       }
-      set["video"].src = '';
+      set["videoFrame"].innerHTML = '';
       set["video"].classList.add('is-hidden');
       set["wrap"].style['background'] = '';
     }
