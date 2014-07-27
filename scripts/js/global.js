@@ -87,16 +87,11 @@
   };
 
   initAudioPlayer = function() {
-    audioPlayer.setVolume(0);
     audioPlayer.bind(SC.Widget.Events.PLAY_PROGRESS, function(data) {
       if (nextItem && data.currentPosition >= nextItem['start']) {
         nextItem = null;
         return advanceShow();
       }
-    });
-    audioPlayer.bind(SC.Widget.Events.LOAD_PROGRESS, function(data) {
-      console.log("Loading");
-      return console.log(data);
     });
     audioPlayer.bind(SC.Widget.Events.PAUSE, function() {
       document.body.classList.remove('playing');

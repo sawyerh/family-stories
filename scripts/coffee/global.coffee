@@ -78,17 +78,11 @@ advanceShow = ->
 
 initAudioPlayer = ->
   # Listen to the play progress
-  audioPlayer.setVolume(0)
-
   audioPlayer.bind SC.Widget.Events.PLAY_PROGRESS, (data) ->
 
     if nextItem && data.currentPosition >= nextItem['start']
       nextItem = null
       advanceShow()
-
-  audioPlayer.bind SC.Widget.Events.LOAD_PROGRESS, (data) ->
-    console.log "Loading"
-    console.log data
 
   audioPlayer.bind SC.Widget.Events.PAUSE, ->
     document.body.classList.remove('playing')
