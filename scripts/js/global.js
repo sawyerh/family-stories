@@ -1,11 +1,13 @@
 (function() {
-  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, contentElements, currentIndex, currentItem, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, transitionEndEventName, transitionEndEventNames, visibleSet;
+  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, transitionEndEventName, transitionEndEventNames, visibleSet;
 
   alphaWrap = document.querySelector('.alpha');
 
   audioPlayer = SC.Widget(document.querySelector('.audio-player iframe'));
 
   betaWrap = document.querySelector('.beta');
+
+  chaptersList = document.querySelector('.list');
 
   contentElements = {
     "alpha": {
@@ -85,13 +87,16 @@
   };
 
   initAudioPlayer = function() {
+    audioPlayer.setVolume(0);
     audioPlayer.bind(SC.Widget.Events.PLAY_PROGRESS, function(data) {
-      console.log(data.currentPosition);
       if (nextItem && data.currentPosition >= nextItem['start']) {
-        console.log("Advance: " + data.currentPosition + " >= " + nextItem['start']);
         nextItem = null;
         return advanceShow();
       }
+    });
+    audioPlayer.bind(SC.Widget.Events.LOAD_PROGRESS, function(data) {
+      console.log("Loading");
+      return console.log(data);
     });
     audioPlayer.bind(SC.Widget.Events.PAUSE, function() {
       document.body.classList.remove('playing');
@@ -129,42 +134,48 @@
     audioPlayer.play();
     return window.setTimeout(function() {
       return audioPlayer.seekTo(time);
-    }, 300);
+    }, 500);
   };
 
   setMedia = function(set, item) {
-    var currentType, hasMap, removedType;
+    var currentType, hasMap, removedType, type, _i, _len, _ref;
     hasMap = false;
-    if (item['image']) {
-      set["bg"].src = item['image'];
+    set["bg"].src = item['image'];
+    if (item['video']) {
+      set["video"].src = item['video'];
+      set["video"].setAttribute('poster', item['image']);
+      set["video"].classList.remove('is-hidden');
+      set["image"].classList.add('is-hidden');
+      set["wrap"].style['background'] = item['color'];
+      currentType = 'video';
+    } else if (item['image']) {
       if (item['lat']) {
         hasMap = true;
         initMap(set, item);
         set["map"].classList.remove('is-hidden');
         set["image"].classList.add('is-hidden');
+        currentType = 'map';
       } else {
         set["image"].src = item['image'];
         set["image"].classList.remove('is-hidden');
+        currentType = 'image';
       }
-      set["bg"].classList.remove('is-hidden');
       set["video"].src = '';
       set["video"].classList.add('is-hidden');
       set["wrap"].style['background'] = '';
-      currentType = 'image';
-    } else if (item['video']) {
-      set["video"].src = item['video'];
-      set["video"].classList.remove('is-hidden');
-      set["bg"].classList.add('is-hidden');
-      set["image"].classList.add('is-hidden');
-      set["wrap"].style['background'] = item['color'];
-      currentType = 'video';
     }
     if (!hasMap) {
       set["map"].classList.add('is-hidden');
       set["map"].innerHTML = '';
     }
     removedType = currentType === 'video' ? 'image' : 'video';
-    set["wrap"].classList.remove("is-" + removedType);
+    _ref = ["image", "map", "video"];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      type = _ref[_i];
+      if (type !== currentType) {
+        set["wrap"].classList.remove("is-" + type);
+      }
+    }
     return set["wrap"].classList.add("is-" + currentType);
   };
 
@@ -176,8 +187,18 @@
       document.body.classList.remove('not-played');
       return audioPlayer.play();
     });
-    return $(playToggle).on('click', function() {
+    $(playToggle).on('click', function() {
       return audioPlayer.toggle();
+    });
+    $('.chapters-toggle').on('click', function() {
+      return chaptersList.classList.toggle('is-hidden');
+    });
+    return $('.chapter-link').on('click', function() {
+      var index;
+      index = this.getAttribute('data-index');
+      chaptersList.classList.add('is-hidden');
+      document.body.classList.remove('not-played');
+      return goTo(index);
     });
   });
 

@@ -1,22 +1,22 @@
 {% capture js %}
-content = [{% for asset in site.pages['stories'].assets %}{
-  {% assign time = asset.meta.start | split: ':' %}
-  {% assign minutes_to_ms = time[0] | times: 60000 %}
-  {% assign seconds_to_ms = time[1] | times: 1000 %}
-  {% assign start_time = minutes_to_ms | plus: seconds_to_ms %}
-  "start": {{ start_time }},
-  {% if asset.type == 'image' %}
-    {% if asset.meta.lat  %}
-      "lat": {{ asset.meta.lat }},
-      "long": {{ asset.meta.long }},
-      "pitch": {{ asset.meta.pitch }},
-      "heading": {{ asset.meta.heading }},
+content = [{% for asset in site.pages['stories'].assets %}{% if asset.meta.start %}{
+    {% assign time = asset.meta.start | split: ':' %}
+    {% assign minutes_to_ms = time[0] | times: 60000 %}
+    {% assign seconds_to_ms = time[1] | times: 1000 %}
+    {% assign start_time = minutes_to_ms | plus: seconds_to_ms %}
+    "start": {{ start_time }},
+    {% if asset.type == 'image' %}
+      {% if asset.meta.lat  %}
+        "lat": {{ asset.meta.lat }},
+        "long": {{ asset.meta.long }},
+        "pitch": {{ asset.meta.pitch }},
+        "heading": {{ asset.meta.heading }},
+      {% endif %}
+      "image": {{ asset.url | json }}
+    {% elsif asset.type == 'video' %}
+      "video": {{ asset.url | json }},
+      "image": {{ asset.meta.placeholder.value | json }}
     {% endif %}
-    "image": {{ asset.url | json }}
-  {% elsif asset.type == 'video' %}
-    "video": {{ asset.url | json }},
-    "color": {{ asset.meta.color | json }}
-  {% endif %}
-}{% unless forloop.last %},{%endunless%}{% endfor %}];
+}{% unless forloop.last %},{%endunless%}{% endif %}{% endfor %}];
 {% endcapture %}
 {{ js }}

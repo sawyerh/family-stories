@@ -3,13 +3,15 @@
  */
 ;window.Modernizr=function(a,b,c){function x(a){i.cssText=a}function y(a,b){return x(prefixes.join(a+";")+(b||""))}function z(a,b){return typeof a===b}function A(a,b){return!!~(""+a).indexOf(b)}function B(a,b){for(var d in a){var e=a[d];if(!A(e,"-")&&i[e]!==c)return b=="pfx"?e:!0}return!1}function C(a,b,d){for(var e in a){var f=b[a[e]];if(f!==c)return d===!1?a[e]:z(f,"function")?f.bind(d||b):f}return!1}function D(a,b,c){var d=a.charAt(0).toUpperCase()+a.slice(1),e=(a+" "+m.join(d+" ")+d).split(" ");return z(b,"string")||z(b,"undefined")?B(e,b):(e=(a+" "+n.join(d+" ")+d).split(" "),C(e,b,c))}var d="2.8.3",e={},f=b.documentElement,g="modernizr",h=b.createElement(g),i=h.style,j,k={}.toString,l="Webkit Moz O ms",m=l.split(" "),n=l.toLowerCase().split(" "),o={},p={},q={},r=[],s=r.slice,t,u=function(){function d(d,e){e=e||b.createElement(a[d]||"div"),d="on"+d;var f=d in e;return f||(e.setAttribute||(e=b.createElement("div")),e.setAttribute&&e.removeAttribute&&(e.setAttribute(d,""),f=z(e[d],"function"),z(e[d],"undefined")||(e[d]=c),e.removeAttribute(d))),e=null,f}var a={select:"input",change:"input",submit:"form",reset:"form",error:"img",load:"img",abort:"img"};return d}(),v={}.hasOwnProperty,w;!z(v,"undefined")&&!z(v.call,"undefined")?w=function(a,b){return v.call(a,b)}:w=function(a,b){return b in a&&z(a.constructor.prototype[b],"undefined")},Function.prototype.bind||(Function.prototype.bind=function(b){var c=this;if(typeof c!="function")throw new TypeError;var d=s.call(arguments,1),e=function(){if(this instanceof e){var a=function(){};a.prototype=c.prototype;var f=new a,g=c.apply(f,d.concat(s.call(arguments)));return Object(g)===g?g:f}return c.apply(b,d.concat(s.call(arguments)))};return e});for(var E in o)w(o,E)&&(t=E.toLowerCase(),e[t]=o[E](),r.push((e[t]?"":"no-")+t));return e.addTest=function(a,b){if(typeof a=="object")for(var d in a)w(a,d)&&e.addTest(d,a[d]);else{a=a.toLowerCase();if(e[a]!==c)return e;b=typeof b=="function"?b():b,typeof enableClasses!="undefined"&&enableClasses&&(f.className+=" "+(b?"":"no-")+a),e[a]=b}return e},x(""),h=j=null,e._version=d,e._domPrefixes=n,e._cssomPrefixes=m,e.hasEvent=u,e.testProp=function(a){return B([a])},e.testAllProps=D,e.prefixed=function(a,b,c){return b?D(a,b,c):D(a,"pfx")},e}(this,this.document);
 (function() {
-  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, contentElements, currentIndex, currentItem, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, transitionEndEventName, transitionEndEventNames, visibleSet;
+  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, transitionEndEventName, transitionEndEventNames, visibleSet;
 
   alphaWrap = document.querySelector('.alpha');
 
   audioPlayer = SC.Widget(document.querySelector('.audio-player iframe'));
 
   betaWrap = document.querySelector('.beta');
+
+  chaptersList = document.querySelector('.list');
 
   contentElements = {
     "alpha": {
@@ -89,13 +91,16 @@
   };
 
   initAudioPlayer = function() {
+    audioPlayer.setVolume(0);
     audioPlayer.bind(SC.Widget.Events.PLAY_PROGRESS, function(data) {
-      console.log(data.currentPosition);
       if (nextItem && data.currentPosition >= nextItem['start']) {
-        console.log("Advance: " + data.currentPosition + " >= " + nextItem['start']);
         nextItem = null;
         return advanceShow();
       }
+    });
+    audioPlayer.bind(SC.Widget.Events.LOAD_PROGRESS, function(data) {
+      console.log("Loading");
+      return console.log(data);
     });
     audioPlayer.bind(SC.Widget.Events.PAUSE, function() {
       document.body.classList.remove('playing');
@@ -133,42 +138,48 @@
     audioPlayer.play();
     return window.setTimeout(function() {
       return audioPlayer.seekTo(time);
-    }, 300);
+    }, 500);
   };
 
   setMedia = function(set, item) {
-    var currentType, hasMap, removedType;
+    var currentType, hasMap, removedType, type, _i, _len, _ref;
     hasMap = false;
-    if (item['image']) {
-      set["bg"].src = item['image'];
+    set["bg"].src = item['image'];
+    if (item['video']) {
+      set["video"].src = item['video'];
+      set["video"].setAttribute('poster', item['image']);
+      set["video"].classList.remove('is-hidden');
+      set["image"].classList.add('is-hidden');
+      set["wrap"].style['background'] = item['color'];
+      currentType = 'video';
+    } else if (item['image']) {
       if (item['lat']) {
         hasMap = true;
         initMap(set, item);
         set["map"].classList.remove('is-hidden');
         set["image"].classList.add('is-hidden');
+        currentType = 'map';
       } else {
         set["image"].src = item['image'];
         set["image"].classList.remove('is-hidden');
+        currentType = 'image';
       }
-      set["bg"].classList.remove('is-hidden');
       set["video"].src = '';
       set["video"].classList.add('is-hidden');
       set["wrap"].style['background'] = '';
-      currentType = 'image';
-    } else if (item['video']) {
-      set["video"].src = item['video'];
-      set["video"].classList.remove('is-hidden');
-      set["bg"].classList.add('is-hidden');
-      set["image"].classList.add('is-hidden');
-      set["wrap"].style['background'] = item['color'];
-      currentType = 'video';
     }
     if (!hasMap) {
       set["map"].classList.add('is-hidden');
       set["map"].innerHTML = '';
     }
     removedType = currentType === 'video' ? 'image' : 'video';
-    set["wrap"].classList.remove("is-" + removedType);
+    _ref = ["image", "map", "video"];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      type = _ref[_i];
+      if (type !== currentType) {
+        set["wrap"].classList.remove("is-" + type);
+      }
+    }
     return set["wrap"].classList.add("is-" + currentType);
   };
 
@@ -180,8 +191,18 @@
       document.body.classList.remove('not-played');
       return audioPlayer.play();
     });
-    return $(playToggle).on('click', function() {
+    $(playToggle).on('click', function() {
       return audioPlayer.toggle();
+    });
+    $('.chapters-toggle').on('click', function() {
+      return chaptersList.classList.toggle('is-hidden');
+    });
+    return $('.chapter-link').on('click', function() {
+      var index;
+      index = this.getAttribute('data-index');
+      chaptersList.classList.add('is-hidden');
+      document.body.classList.remove('not-played');
+      return goTo(index);
     });
   });
 
