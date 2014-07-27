@@ -142,7 +142,11 @@
     hasMap = false;
     set["bg"].src = item['image'];
     if (item['video']) {
-      set["video"].src = item['video'];
+      if (Modernizr.video && Modernizr.video.h264) {
+        set["video"].src = item['video'];
+      } else {
+        set["video"].src = item['ogv'];
+      }
       set["video"].setAttribute('poster', item['image']);
       set["video"].classList.remove('is-hidden');
       set["image"].classList.add('is-hidden');
@@ -183,7 +187,7 @@
     setMedia(visibleSet, content[0]);
     setMedia(hiddenSet, content[1]);
     initAudioPlayer();
-    $('.start-button').on('click', function() {
+    $('.intro').on('click', function() {
       document.body.classList.remove('not-played');
       return audioPlayer.play();
     });
@@ -193,13 +197,16 @@
     $('.chapters-toggle').on('click', function() {
       return chaptersList.classList.toggle('is-hidden');
     });
-    return $('.chapter-link').on('click', function() {
+    $('.chapter-link').on('click', function() {
       var index;
       index = this.getAttribute('data-index');
       chaptersList.classList.add('is-hidden');
       document.body.classList.remove('not-played');
       return goTo(index);
     });
+    if (!(Modernizr['cssfilters'] || Modernizr['svgfilters'])) {
+      return document.body.classList.add('no-blur');
+    }
   });
 
 }).call(this);

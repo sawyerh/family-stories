@@ -135,7 +135,11 @@ setMedia = (set, item) ->
   set["bg"].src = item['image']
 
   if item['video']
-    set["video"].src = item['video']
+    if Modernizr.video && Modernizr.video.h264
+      set["video"].src = item['video']
+    else
+      set["video"].src = item['ogv']
+
     set["video"].setAttribute('poster', item['image'])
     set["video"].classList.remove('is-hidden')
     set["image"].classList.add('is-hidden')
@@ -175,9 +179,8 @@ $ ->
   setMedia(hiddenSet, content[1])
   initAudioPlayer()
 
-  $('.start-button').on 'click', ->
+  $('.intro').on 'click', ->
     document.body.classList.remove('not-played')
-    # goTo(2)
     audioPlayer.play()
 
   $(playToggle).on 'click', ->
@@ -191,3 +194,7 @@ $ ->
     chaptersList.classList.add('is-hidden')
     document.body.classList.remove('not-played')
     goTo(index)
+
+  # Check for blurred bg support
+  if !(Modernizr['cssfilters'] || Modernizr['svgfilters'])
+    document.body.classList.add('no-blur')

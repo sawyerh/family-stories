@@ -15,8 +15,9 @@ content = [{% for asset in site.pages['stories'].assets %}{% if asset.meta.start
       "image": {{ asset.url | json }}
     {% elsif asset.type == 'video' %}
       "video": {{ asset.url | json }},
+      "ogv": {{ asset.meta.ogv.value | json }},
       "image": {{ asset.meta.placeholder.value | json }}
     {% endif %}
 }{% unless forloop.last %},{%endunless%}{% endif %}{% endfor %}];
 {% endcapture %}
-{{ js }}
+{{ js | strip_newlines }}
