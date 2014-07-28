@@ -61,9 +61,9 @@
     {% for asset in assets %}
       {% if asset.meta.start %}
         {% if asset.type == 'image' %}
-          {% capture image_url %}{{ asset.file.first.last | replace:'https://siteleaf-cdn.s3.amazonaws.com','//siteleaf2.imgix.net' }}?fit=max&w=400&h=400&q=80{% endcapture %}
+          {% capture image_url %}{{ asset.file.first.last | split:'?' | first | replace:'https://siteleaf-cdn.s3.amazonaws.com','//siteleaf2.imgix.net' }}?fit=max&w=400&h=400&q=80{% endcapture %}
         {% else %}
-          {% capture image_url %}{{ asset.meta.placeholder.value | replace:'https://siteleaf-cdn.s3.amazonaws.com','//siteleaf2.imgix.net' }}?fit=max&w=400&h=400&q=80{% endcapture %}
+          {% capture image_url %}{{ asset.meta.placeholder.value | split:'?' | first | replace:'https://siteleaf-cdn.s3.amazonaws.com','//siteleaf2.imgix.net' }}?fit=max&w=400&h=400&q=80{% endcapture %}
         {% endif %}
         <li data-index="{{ i }}" class="chapter-link" style="background-image:url('{{ image_url }}')">
         </li>
