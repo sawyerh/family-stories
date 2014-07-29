@@ -1,5 +1,6 @@
 alphaWrap = document.querySelector('.alpha')
 audioPlayer = SC.Widget(document.querySelector('.audio-player iframe'))
+audioDuration = null
 betaWrap = document.querySelector('.beta')
 chaptersList = document.querySelector('.list')
 contentElements = {
@@ -26,6 +27,8 @@ currentItem = content[currentIndex]
 hiddenSet = contentElements["beta"]
 nextItem = content[currentIndex + 1]
 playToggle = document.querySelector('.play-toggle')
+progress = document.querySelector('.progress')
+time = document.querySelector('.time')
 visibleSet = contentElements["alpha"]
 
 if Modernizr.testProp('webkitAnimation')
@@ -81,10 +84,15 @@ advanceShow = ->
 initAudioPlayer = ->
   # Listen to the play progress
   audioPlayer.bind SC.Widget.Events.PLAY_PROGRESS, (data) ->
+    setProgress(data.relativePosition, data.currentPosition)
 
     if nextItem && data.currentPosition >= nextItem['start']
       nextItem = null
       advanceShow()
+
+  audioPlayer.bind SC.Widget.Events.SEEK, (data) ->
+    setProgress(data.relativePosition, data.currentPosition)
+    showItemByTime(data.currentPosition)
 
   audioPlayer.bind SC.Widget.Events.PAUSE, ->
     document.body.classList.remove('playing')
@@ -111,17 +119,50 @@ initMap = (set, item) ->
   myPano.setVisible true
 
 
+formatTime = (ms) ->
+  totalSeconds = ms / 1000
+
+  # Change to minute:second format
+  totalSeconds %= 3600;
+  minutes = Math.floor(totalSeconds / 60);
+  seconds = Math.floor(totalSeconds % 60);
+
+  if minutes < 10
+    minutes = "0" + minutes
+
+  if seconds < 10
+    seconds = "0" + seconds
+
+  # Format time string
+  timeString = ''
+  timeString += minutes + ':'
+  timeString += seconds
+
+  return timeString
+
+
+getItemIndexByTime = (time) ->
+  currentIndex = 0
+  for item, index in content
+    if time >= item['start']
+      currentIndex = index
+  return currentIndex
+
+
 getYoutubeIframe = (id) ->
   "<iframe width='420' height='315' src='//www.youtube.com/embed/#{id}?rel=0&loop=1&autoplay=1&controls=0&playsinline=1&modestbranding=1&playlist=#{id}' frameborder='0'></iframe>"
 
-goTo = (index) ->
-  currentIndex = index - 1
-  setMedia(hiddenSet, content[index])
-  advanceShow()
 
-  time = currentItem["start"]
-  audioPlayer.play()
-  audioPlayer.seekTo(time)
+showItemByTime = (time) ->
+  currentIndex = getItemIndexByTime(time)
+  currentItem = content[currentIndex]
+  nextIndex = currentIndex + 1
+
+  setMedia(visibleSet, currentItem)
+
+  if nextIndex < content.length
+    nextItem = content[nextIndex]
+    setMedia(hiddenSet, nextItem)
 
 
 setMedia = (set, item) ->
@@ -164,8 +205,29 @@ setMedia = (set, item) ->
   set["wrap"].classList.add("is-#{currentType}")
 
 
+setProgress = (pos, ms) ->
+  progress.style.width = "#{pos * 100}%"
+  time.innerHTML = formatTime(ms)
+
+
+seekVideoByIndex = (index) ->
+  time = content[index]["start"]
+  audioPlayer.play()
+  audioPlayer.seekTo(time)
+
+
+seekVideoByRatio = (pos) ->
+  if !audioDuration
+    audioPlayer.getDuration (data) ->
+      audioDuration = data
+      seekVideoByRatio(pos)
+  else
+    audioPlayer.seekTo(audioDuration * pos)
+
+
 toggleChapterList = ->
   chaptersList.classList.toggle('is-hidden')
+  document.body.classList.toggle('showing-chapters')
 
   if chaptersList.classList.contains('is-hidden')
     $(window).off 'keyup.chapters'
@@ -193,7 +255,7 @@ $ ->
     index = this.getAttribute('data-index')
     toggleChapterList()
     document.body.classList.remove('not-played')
-    goTo(index)
+    seekVideoByIndex(index)
 
   # Check for blurred bg support
   if !(Modernizr['cssfilters'] || Modernizr['svgfilters'])
@@ -204,3 +266,10 @@ $ ->
     if e.keyCode == 32 # space
       document.body.classList.remove('not-played')
       audioPlayer.toggle()
+
+  # Seek bar
+  $('.seek-bar').on 'click', (ev) ->
+    $div = $(ev.target)
+    offset = $div.offset()
+    x = ev.clientX - offset.left
+    seekVideoByRatio(x / this.offsetWidth) if x

@@ -1,9 +1,20 @@
 @import 'toolbox'
 
+$h_controls: 70px
+
+$w_seek_bar: 350px
+$w_seek_bar_downsized: 200px
+
+$w_controls: $w_seek_bar + 110px
+$w_controls_downsized: $w_seek_bar_downsized + 110px
+
+$ff_sans: "freight-sans-pro", sans-serif
+$ff_serif: "freight-display-pro", serif
+
 body
   padding: 0
   margin: 0
-  font-family: "freight-display-pro", serif
+  font-family: $ff_serif
   background: #000
   color: #fff
 
@@ -109,7 +120,6 @@ body
   font-size: 40px
   font-style: italic
   z-index: 100
-  text-align: center
   display: none
 
   +max-width(900px)
@@ -121,22 +131,36 @@ body
   p
     max-width: 850px
     padding: 0 30px
-    margin: 0 auto 20px
+    margin: 0 auto
+
+    +max-width(900px)
+      max-width: 85%
 
 .not-played .intro
   display: block
 
 .start-button
   transition: border 250ms ease
-  font-size: 30px
+  font-size: 24px
   font-style: normal
   cursor: pointer
-  opacity: 0.7
   display: block
-  margin: 45px 0
+  margin: 30px 0 0
+  font-family: $ff_sans
+  font-weight: 600
+  text-transform: uppercase
+  text-align: right
+
+  +max-width(600px)
+    font-size: 18px
+
+  &:after
+    vertical-align: middle
+    font-size: 75%
+    margin-left: 15px
 
   &:hover
-    opacity: 1
+    opacity: 0.7
 
 .image
   +transform-style(preserve-3d) // fixes animation flicker
@@ -185,23 +209,81 @@ body
   pointer-events: none
 
 .play-toggle, .chapters-toggle
-  position: fixed
-  left: 0
-  bottom: 0
-  font-size: 16px
+  +transform(translateY(-50%))
+  position: absolute
+  left: 15px
+  top: 50%
+  font-size: 20px
   color: rgba(#fff, 0.5)
-  text-shadow: 0 0 20px rgba(#000, 0.4)
   transition: opacity 250ms ease
   cursor: pointer
+  padding: 8px 0 0
   z-index: 200
-  padding: 20px
-
-  .not-played &
-    display: none
+  line-height: 1
 
   &:hover
     color: rgba(#fff, 1)
 
 .chapters-toggle
   left: auto
-  right: 0
+  right: 15px
+
+.play-toggle
+  font-size: 28px
+
+.controls
+  position: fixed
+  bottom: 0
+  left: 50%
+  width: 100%
+  z-index: 200
+  height: $h_controls
+  text-align: center
+  width: $w_controls
+  margin-left: ($w_controls / 2) * -1
+  padding: 0 15px
+
+  +max-width(500px)
+    width: $w_controls_downsized
+    margin-left: ($w_controls_downsized / 2) * -1
+
+  // .not-played &
+  //   display: none
+
+  .showing-chapters &
+    background: rgba(#000, 0.75)
+
+.seek-bar
+  height: 4px
+  margin-top: ($h_controls - 4px) / 2
+  margin-left: 6px
+  width: $w_seek_bar
+  background: rgba(#fff, 0.25)
+  display: inline-block
+  position: relative
+  cursor: pointer
+  transition: all 250ms ease
+
+  +max-width(500px)
+    width: $w_seek_bar_downsized
+
+  &:hover
+    height: 8px
+    margin-top: ($h_controls - 8px) / 2
+
+.progress
+  position: absolute
+  left: 0
+  height: 100%
+  background: rgba(#fff, 0.7)
+
+.time
+  position: absolute
+  pointer-events: none
+  font-family: $ff_sans
+  font-size: 11px
+  letter-spacing: 1px
+  width: 100%
+  left: 0
+  bottom: 12px
+  color: rgba(#fff, 0.5)

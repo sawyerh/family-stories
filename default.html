@@ -17,7 +17,7 @@
   <link rel="canonical" href="{{permalink}}" />
   <link rel="alternate" type="application/rss+xml" href="{{site.feed_url}}" />
   <link rel="stylesheet" type="text/css" href="/styles/css/global.css" />
-  <link href="//cdn.symbolset.com/fd57d354427fe42c496542a9ccca79245f49f977/symbolset.css" rel="stylesheet">
+  <link href="//cdn.symbolset.com/7786c206fc53d0aeb4d5e57eaab6a453ce45598e/symbolset.css" rel="stylesheet">
 
   <script type="text/javascript" src="//use.typekit.net/cof3caa.js"></script>
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
@@ -35,7 +35,6 @@
   </script>
   <section class="intro">
     {{ body }}
-    <span class="start-button ss-icon">navigateright</span>
   </section>
 
   <section class="alpha image-wrap is-active">
@@ -72,8 +71,14 @@
     {% endfor %}
   </ol>
 
-  <span class="ss-icon chapters-toggle">list</span>
-  <span class="ss-icon play-toggle">play</span>
+  <div class="controls">
+    <span class="ss-icon play-toggle">play</span>
+    <div class="seek-bar">
+      <span class="progress"></span>
+    </div>
+    <span class="time"></span>
+    <span class="ss-icon chapters-toggle">list</span>
+  </div>
 
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>

@@ -1,9 +1,11 @@
 (function() {
-  var advanceShow, alphaWrap, animationEndEventName, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, getYoutubeIframe, goTo, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, setMedia, toggleChapterList, transitionEndEventName, transitionEndEventNames, visibleSet;
+  var advanceShow, alphaWrap, animationEndEventName, audioDuration, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, formatTime, getItemIndexByTime, getYoutubeIframe, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, progress, seekVideoByIndex, seekVideoByRatio, setMedia, setProgress, showItemByTime, time, toggleChapterList, transitionEndEventName, transitionEndEventNames, visibleSet;
 
   alphaWrap = document.querySelector('.alpha');
 
   audioPlayer = SC.Widget(document.querySelector('.audio-player iframe'));
+
+  audioDuration = null;
 
   betaWrap = document.querySelector('.beta');
 
@@ -37,6 +39,10 @@
   nextItem = content[currentIndex + 1];
 
   playToggle = document.querySelector('.play-toggle');
+
+  progress = document.querySelector('.progress');
+
+  time = document.querySelector('.time');
 
   visibleSet = contentElements["alpha"];
 
@@ -87,10 +93,15 @@
 
   initAudioPlayer = function() {
     audioPlayer.bind(SC.Widget.Events.PLAY_PROGRESS, function(data) {
+      setProgress(data.relativePosition, data.currentPosition);
       if (nextItem && data.currentPosition >= nextItem['start']) {
         nextItem = null;
         return advanceShow();
       }
+    });
+    audioPlayer.bind(SC.Widget.Events.SEEK, function(data) {
+      setProgress(data.relativePosition, data.currentPosition);
+      return showItemByTime(data.currentPosition);
     });
     audioPlayer.bind(SC.Widget.Events.PAUSE, function() {
       document.body.classList.remove('playing');
@@ -119,18 +130,50 @@
     return myPano.setVisible(true);
   };
 
+  formatTime = function(ms) {
+    var minutes, seconds, timeString, totalSeconds;
+    totalSeconds = ms / 1000;
+    totalSeconds %= 3600;
+    minutes = Math.floor(totalSeconds / 60);
+    seconds = Math.floor(totalSeconds % 60);
+    if (minutes < 10) {
+      minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+      seconds = "0" + seconds;
+    }
+    timeString = '';
+    timeString += minutes + ':';
+    timeString += seconds;
+    return timeString;
+  };
+
+  getItemIndexByTime = function(time) {
+    var index, item, _i, _len;
+    currentIndex = 0;
+    for (index = _i = 0, _len = content.length; _i < _len; index = ++_i) {
+      item = content[index];
+      if (time >= item['start']) {
+        currentIndex = index;
+      }
+    }
+    return currentIndex;
+  };
+
   getYoutubeIframe = function(id) {
     return "<iframe width='420' height='315' src='//www.youtube.com/embed/" + id + "?rel=0&loop=1&autoplay=1&controls=0&playsinline=1&modestbranding=1&playlist=" + id + "' frameborder='0'></iframe>";
   };
 
-  goTo = function(index) {
-    var time;
-    currentIndex = index - 1;
-    setMedia(hiddenSet, content[index]);
-    advanceShow();
-    time = currentItem["start"];
-    audioPlayer.play();
-    return audioPlayer.seekTo(time);
+  showItemByTime = function(time) {
+    var nextIndex;
+    currentIndex = getItemIndexByTime(time);
+    currentItem = content[currentIndex];
+    nextIndex = currentIndex + 1;
+    setMedia(visibleSet, currentItem);
+    if (nextIndex < content.length) {
+      nextItem = content[nextIndex];
+      return setMedia(hiddenSet, nextItem);
+    }
   };
 
   setMedia = function(set, item) {
@@ -174,8 +217,31 @@
     return set["wrap"].classList.add("is-" + currentType);
   };
 
+  setProgress = function(pos, ms) {
+    progress.style.width = "" + (pos * 100) + "%";
+    return time.innerHTML = formatTime(ms);
+  };
+
+  seekVideoByIndex = function(index) {
+    time = content[index]["start"];
+    audioPlayer.play();
+    return audioPlayer.seekTo(time);
+  };
+
+  seekVideoByRatio = function(pos) {
+    if (!audioDuration) {
+      return audioPlayer.getDuration(function(data) {
+        audioDuration = data;
+        return seekVideoByRatio(pos);
+      });
+    } else {
+      return audioPlayer.seekTo(audioDuration * pos);
+    }
+  };
+
   toggleChapterList = function() {
     chaptersList.classList.toggle('is-hidden');
+    document.body.classList.toggle('showing-chapters');
     if (chaptersList.classList.contains('is-hidden')) {
       return $(window).off('keyup.chapters');
     } else {
@@ -206,15 +272,24 @@
       index = this.getAttribute('data-index');
       toggleChapterList();
       document.body.classList.remove('not-played');
-      return goTo(index);
+      return seekVideoByIndex(index);
     });
     if (!(Modernizr['cssfilters'] || Modernizr['svgfilters'])) {
       document.body.classList.add('no-blur');
     }
-    return $(window).on('keyup.global', function(e) {
+    $(window).on('keyup.global', function(e) {
       if (e.keyCode === 32) {
         document.body.classList.remove('not-played');
         return audioPlayer.toggle();
+      }
+    });
+    return $('.seek-bar').on('click', function(ev) {
+      var $div, offset, x;
+      $div = $(ev.target);
+      offset = $div.offset();
+      x = ev.clientX - offset.left;
+      if (x) {
+        return seekVideoByRatio(x / this.offsetWidth);
       }
     });
   });
