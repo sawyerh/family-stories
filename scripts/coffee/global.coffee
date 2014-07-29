@@ -28,7 +28,7 @@ hiddenSet = contentElements["beta"]
 nextItem = content[currentIndex + 1]
 playToggle = document.querySelector('.play-toggle')
 progress = document.querySelector('.progress')
-time = document.querySelector('.time')
+timeEl = document.querySelector('.time')
 visibleSet = contentElements["alpha"]
 
 if Modernizr.testProp('webkitAnimation')
@@ -207,7 +207,7 @@ setMedia = (set, item) ->
 
 setProgress = (pos, ms) ->
   progress.style.width = "#{pos * 100}%"
-  time.innerHTML = formatTime(ms)
+  timeEl.innerHTML = formatTime(ms)
 
 
 seekVideoByIndex = (index) ->

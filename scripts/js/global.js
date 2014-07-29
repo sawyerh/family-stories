@@ -1,5 +1,5 @@
 (function() {
-  var advanceShow, alphaWrap, animationEndEventName, audioDuration, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, formatTime, getItemIndexByTime, getYoutubeIframe, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, progress, seekVideoByIndex, seekVideoByRatio, setMedia, setProgress, showItemByTime, time, toggleChapterList, transitionEndEventName, transitionEndEventNames, visibleSet;
+  var advanceShow, alphaWrap, animationEndEventName, audioDuration, audioPlayer, betaWrap, chaptersList, contentElements, currentIndex, currentItem, formatTime, getItemIndexByTime, getYoutubeIframe, hiddenSet, initAudioPlayer, initMap, nextItem, playToggle, progress, seekVideoByIndex, seekVideoByRatio, setMedia, setProgress, showItemByTime, timeEl, toggleChapterList, transitionEndEventName, transitionEndEventNames, visibleSet;
 
   alphaWrap = document.querySelector('.alpha');
 
@@ -42,7 +42,7 @@
 
   progress = document.querySelector('.progress');
 
-  time = document.querySelector('.time');
+  timeEl = document.querySelector('.time');
 
   visibleSet = contentElements["alpha"];
 
@@ -219,10 +219,11 @@
 
   setProgress = function(pos, ms) {
     progress.style.width = "" + (pos * 100) + "%";
-    return time.innerHTML = formatTime(ms);
+    return timeEl.innerHTML = formatTime(ms);
   };
 
   seekVideoByIndex = function(index) {
+    var time;
     time = content[index]["start"];
     audioPlayer.play();
     return audioPlayer.seekTo(time);
