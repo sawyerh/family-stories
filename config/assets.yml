@@ -1,7 +1,0 @@
-gzip_assets: off
-compress_assets: on
-
-javascripts:
-  application:
-    - scripts/js/plugins/modernizr.js
-    - scripts/js/global.js

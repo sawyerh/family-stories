@@ -1,11 +1,9 @@
 source 'https://rubygems.org'
+# This should match the version used by GitHub Pages (https://pages.github.com/versions/)
+gem 'jekyll', '3.7.3'
 
-gem 'guard'
-gem 'guard-sass'
-gem 'guard-coffeescript'
-gem 'guard-copy'
-gem 'guard-jammit'
-gem 'guard-livereload'
-gem 'terminal-notifier-guard'
-gem 'siteleaf'
-gem 'thin'
+group :jekyll_plugins do
+  gem 'jekyll-redirect-from'
+  gem 'jekyll-seo-tag'
+  gem 'jekyll-sitemap'
+end

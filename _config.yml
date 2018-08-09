@@ -1,0 +1,16 @@
+---
+title: Hollenshead Grandparent Stories
+url: http://stories.hollenshead.co
+timezone: Eastern Time (US & Canada)
+permalink: pretty
+markdown: kramdown
+collections:
+  uploads:
+    title: Uploads
+    output: true
+defaults:
+- scope:
+    path: ''
+    type: posts
+  values:
+    permalink: "/stories/:title/"
