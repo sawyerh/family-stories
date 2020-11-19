@@ -3,7 +3,6 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let animationEndEventName;
 const alphaWrap = document.querySelector(".alpha");
 const audioPlayer = SC.Widget(document.querySelector(".audio-player iframe"));
 let audioDuration = null;
@@ -37,23 +36,8 @@ const progress = document.querySelector(".progress");
 const timeEl = document.querySelector(".time");
 let visibleSet = contentElements["alpha"];
 
-if (Modernizr.testProp("webkitAnimation")) {
-  animationEndEventName = "webkitAnimationEnd";
-} else if (Modernizr.testProp("mozAnimation")) {
-  animationEndEventName = "mozAnimationEnd";
-} else {
-  animationEndEventName = "animationEnd";
-}
-
-const transitionEndEventNames = {
-  WebkitTransition: "webkitTransitionEnd",
-  MozTransition: "transitionend",
-  OTransition: "oTransitionEnd",
-  msTransition: "MSTransitionEnd",
-  transition: "transitionend",
-};
-const transitionEndEventName =
-  transitionEndEventNames[Modernizr.prefixed("transition")];
+const animationEndEventName = "animationEnd";
+const transitionEndEventName = "transitionend";
 
 // Toggles the visibility of the sets
 // and preloads the next item after the transition
@@ -293,11 +277,6 @@ $(function () {
     document.body.classList.remove("not-played");
     return seekVideoByIndex(index);
   });
-
-  // Check for blurred bg support
-  if (!(Modernizr["cssfilters"] || Modernizr["svgfilters"])) {
-    document.body.classList.add("no-blur");
-  }
 
   // Play/pause shortcut
   $(window).on("keyup.global", function (e) {
