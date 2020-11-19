@@ -159,7 +159,7 @@ const getItemIndexByTime = function (time) {
 };
 
 const getYoutubeIframe = (id) =>
-  `<iframe width='420' height='315' src='//www.youtube.com/embed/${id}?rel=0&loop=1&autoplay=1&controls=0&playsinline=1&modestbranding=1&playlist=${id}' frameborder='0'></iframe>`;
+  `<iframe allow='autoplay' width='420' height='315' src='//www.youtube.com/embed/${id}?rel=0&loop=1&autoplay=1&mute=1&controls=0&playsinline=1&modestbranding=1&playlist=${id}' frameborder='0'></iframe>`;
 
 var showItemByTime = function (time) {
   currentIndex = getItemIndexByTime(time);
